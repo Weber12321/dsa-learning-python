@@ -21,17 +21,6 @@ class Solution:
 
     # 217: Contains Duplicate
     def containsDuplicate(self, nums: List[int]) -> bool:
-
-        # faster than 34%
-        # d = {}
-        # for i in nums:
-        #     if i in d:
-        #         return True
-        #     else:
-        #         d[i] = True
-        #
-        # return False
-
         # faster than 56%
         uniq_list = set(nums)
         if len(nums) == len(uniq_list):
@@ -51,6 +40,17 @@ class Solution:
             output[i] *= product
             product *= nums[i]
         return output
+
+    # 53. Maximum Subarray
+    def maxSubArray(self, nums: List[int]) -> int:
+        if len(nums) == 0:
+            return 0
+        max_value = nums[0]
+        sum_value = nums[0]
+        for idx in range(1, len(nums)):
+            sum_value = max(sum_value + nums[idx], nums[idx])
+            max_value = max(sum_value, max_value)
+        return max_value
 
 
 if __name__ == '__main__':
