@@ -1,3 +1,5 @@
+import string
+from collections import defaultdict, Counter
 from typing import List
 
 
@@ -147,8 +149,228 @@ class Solution:
 
         return max_area
 
+    # 3. Longest Substring Without Repeating Characters
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        sub_string = []
+        max_len = 0
 
+        for i in range(len(s)):
+            if s[i] in sub_string:
+                sub_string = sub_string[sub_string.index(s[i])+1:]
+            sub_string.append(s[i])
+            max_len = max(max_len, len(sub_string))
 
+        return max_len
+
+    # 424. Longest Repeating Character Replacement  (X)
+    def characterReplacement(self, s: str, k: int) -> int:
+        behind, ahead = 0, 0
+        char_count = defaultdict(int)
+        char_count[s[ahead]] += 1
+        max_length = 0
+
+        while ahead < len(s):
+            length = ahead - behind + 1
+            max_freq = max(char_count.values())
+            if length - max_freq <= k:
+                max_length = max(length, max_length)
+                ahead += 1
+                if ahead == len(s):
+                    break
+                char_count[s[ahead]] += 1
+            else:
+                char_count[s[behind]] -= 1
+                behind += 1
+
+        return max_length
+
+    # 242. Valid Anagram
+    def isAnagram(self, s: str, t: str) -> bool:
+        if Counter(s) == Counter(t):
+            return True
+        else:
+            return False
+
+    # 49. Group Anagrams
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        output = defaultdict(list)
+        for i in strs:
+            sorted_string = ''.join(sorted(i))
+            output[sorted_string].append(i)
+        return list(output.values())
+
+    # 20. Valid Parentheses
+    def isValid(self, s: str) -> bool:
+        if len(s) % 2 != 0:
+            return False
+        dict = {'(': ')', '[': ']', '{': '}'}
+        stack = []
+        for i in s:
+            if i in dict.keys():
+                stack.append(i)
+            else:
+                if stack == []:
+                    return False
+                a = stack.pop()
+                if i != dict[a]:
+                    return False
+        return stack == []
+
+    # 125. Valid Palindrome
+    def isPalindrome(self, s: str) -> bool:
+        lst = [char for char in s.lower() if char.isalnum()]
+        return lst == lst[::-1]
+
+    # 5. Longest Palindromic Substring (X)
+    def longestPalindrome(self, s: str) -> str:
+        if len(s) <= 1 or s == s[::-1]:
+            return s
+        else:
+            max_len = 1
+            start = 0
+            for i in range(1, len(s)):
+                odd = s[i - max_len - 1: i + 1]
+                even = s[i - max_len: i + 1]
+                if i - max_len - 1 >= 0 and odd == odd[::-1]:
+                    start = i - max_len - 1
+                    max_len = max_len + 2
+                    continue
+                if even == even[::-1]:
+                    start = i - max_len
+                    max_len = max_len + 1
+        return s[start: start + max_len]
+
+    # 647. Palindromic Substrings (X)
+    def countSubstrings(self, s: str) -> int:
+        res = 0
+        l = len(s)
+        for mid in range(l * 2 - 1):
+            left = mid // 2
+            right = left + mid % 2
+            while left >= 0 and right < l and s[left] == s[right]:
+                res += 1
+                left -= 1
+                right += 1
+        return res
+
+    # 371. Sum of Two Integers (X)
+    def getSum(self, a: int, b: int) -> int:
+        # 32 bits integer max
+        while b != 0:
+            carry = a & b
+            a = (a ^ b)
+            b = (carry << 1)
+        return a if a <= 0x7FFFFFFF else a | (~0x100000000 + 1)
+
+    # 73. Set Matrix Zeroes
+    def setZeroes(self, matrix: List[List[int]]) -> None:
+        zeros = [0] * len(matrix[0])
+        cols = set()
+        rows = set()
+        for row in range(len(matrix)):
+            for col in range(len(matrix[row])):
+                if matrix[row][col] == 0:
+                    cols.add(col)
+                    rows.add(row)
+
+        for row in rows:
+            matrix[row] = zeros
+
+        for col in cols:
+            for row in range(len(matrix)):
+                matrix[row][col] = 0
+
+    # 54. Spiral Matrix
+    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+        output = []
+        while matrix:
+            output.extend(matrix.pop(0))
+            matrix[:] = list(zip(*matrix))[::-1]
+        return output
+
+    # 48. Rotate Image
+    def rotate(self, matrix: List[List[int]]) -> None:
+        # matrix = np.array(matrix)
+        # return np.rot90(matrix, 3)
+        matrix[::] = list(zip(*matrix[::-1]))
+
+    # 79. Word Search (XX)
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        seen = set()
+        def backtrack(i, j, lenght):
+            if lenght == len(word):
+                return True
+            if i not in range(0, len(board)) or j not in range(0, len(board[0])):
+                return False
+            cur = (i, j)
+            if cur in seen or board[i][j] != word[lenght]:
+                return False
+
+            seen.add(cur)
+            ret = backtrack(i - 1, j, lenght + 1) or backtrack(i + 1, j, lenght + 1) or backtrack(i, j - 1,
+                                                                                                  lenght + 1) or backtrack(
+                i, j + 1, lenght + 1)
+            seen.remove(cur)
+            return ret
+
+        board_letters, word_letters = {}, dict(Counter(word))
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] not in board_letters:
+                    board_letters[board[i][j]] = 1
+                else:
+                    board_letters[board[i][j]] += 1
+        for key in word_letters:
+            if key not in board_letters or board_letters[key] < word_letters[key]:
+                return False
+
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if backtrack(i, j, 0):
+                    return True
+        return False
+
+    # 56. Merge Intervals (X)
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        if len(intervals) == 0:
+            return []
+        intervals.sort()
+        res = [intervals[0]]
+        for interval in intervals[1:]:
+            # the next node's smallest value is smaller than the prev node's largest value, then overlapping
+            if interval[0] <= res[-1][1]:
+                # left boundary is the largest value
+                res[-1][1] = max(interval[1], res[-1][1])
+            else:
+                res.append(interval)
+        return res
+
+    # 57. Insert Interval (X)
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        intervals.extend([newInterval])
+        intervals.sort()
+        results = []
+        for si, ei in intervals:
+            if not results or results[-1][1] < si:
+                results.append([si, ei])
+            else:
+                results[-1][1] = max(results[-1][1], ei)
+        return results
+
+    # 435. Non-overlapping Intervals
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        if len(intervals) == 0:
+            return 0
+        intervals.sort()
+        now = intervals[0][1]
+        res = 0
+        for i in intervals[1:]:
+            if i[0] < now:
+                now = min(i[1], now)
+                res += 1
+            else:
+                now = i[1]
+        return res
 
 
 
