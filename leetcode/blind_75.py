@@ -1,9 +1,17 @@
-import string
 from collections import defaultdict, Counter
 from typing import List
 
+# 69
 
 class Solution:
+    # 1. Two Sum
+    def twoSum(self, nums, target):
+        for idx in range(len(nums)):
+            diff = target - nums[idx]
+            if diff in nums:
+                if idx != nums.index(diff):
+                    return [idx, nums.index(diff)]
+
     # 121: Best Time to Buy and Sell Stock
     def maxProfit(self, prices: List[int]) -> int:
         if len(prices) < 2:
@@ -372,12 +380,59 @@ class Solution:
                 now = i[1]
         return res
 
+    # 347. Top K Frequent Elements
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        counter = Counter(nums)
+        return [c[0] for c in counter.most_common()][0:k]
+
+    # 70. Climbing Stairs
+    def climbStairs(self, n: int) -> int:
+        # f(n) = f(n-1) + f(n-2)
+        lst = [0] * n
+        for i in range(n):
+            if i == 0:
+                lst[i] = 1
+            elif i == 1:
+                lst[i] = 2
+            else:
+                lst[i] = lst[i-1] + lst[i-2]
+        return lst[n-1]
+
+    # 322. Coin Change (XX)
+    def coinChange(self, coins: List[int], amount: int) -> int:
+        # dp[i] 表示组成i所需的最少硬币数
+        # dp[i]= min(dp[i], dp[i - coin] + 1) for c in coins if i >= coin
+        # dp[0] = 0
+        # dp[n] 为所求
+
+        dp = [float('inf')] * (amount + 1)
+        dp[0] = 0
+        for coin in coins:
+            for i in range(coin, amount + 1):
+                dp[i] = min(dp[i], dp[i - coin] + 1)
+        return dp[amount] if dp[amount] != float('inf') else -1
+
+    # 300. Longest Increasing Subsequence (XX)
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        if nums == []:
+            return 0
+        N = len(nums)
+        Dp = [1] * N
+        for i in range(N - 1):
+            for j in range(0, i + 1):
+                if nums[i + 1] > nums[j]:
+                    Dp[i + 1] = max(Dp[i + 1], Dp[j] + 1)
+        return max(Dp)
+
+
 
 
 if __name__ == '__main__':
     s = Solution()
-    lst =[4,5,6,7,0,1,2]
-    print(s.search(lst, 5))
+    fn = len([i for i in dir(s) if not i.startswith('__')])
+    hard = 3
+    print('Number of finished: ', fn)
+    print('Number of lasting: ', 75-6-hard-fn)
 
 
 
